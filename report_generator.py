@@ -9,11 +9,11 @@ from dotenv import load_dotenv
 import matplotlib.font_manager as fm
 
 load_dotenv()
-api_key = os.getenv('API_KEY')
+api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
 
 # 한글 폰트 설정
-font_path = 'MaruBuri-Regular.otf'
+font_path = '/Users/isaac/Library/Fonts/maruburi/MaruBuri-Regular.otf'
 font_prop = fm.FontProperties(fname=font_path)
 fm.fontManager.addfont(font_path)
 plt.rcParams['font.family'] = font_prop.get_name()
@@ -234,9 +234,8 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data):
 
         fig, ax = plt.subplots(figsize=(30, len(df) * 1.2))
         ax.axis('off')
-        table = ax.table(cellText=df[['대학명', '전형구분', '전형명', '전공', '2025년_모집인원', '수능_최저요건',
-                                      '2024년_경쟁률', '2023년_경쟁률', '2024년_입결70%', '2024년_추가합격자수',
-                                      '2025_주요_변경사항', '대학별_고사_일정']].values,
+        table = ax.table(cellText=df[['대학명', '전형구분', '전형명', '전공', '2025년_모집인원', '2025년_수능최저',
+                                      '2024년_경쟁률', '2023년_경쟁률', '2024년_입결70%', '2024년_추가합격자수']].values,
                          colLabels=['대학교', '전형유형', '전형명', '전공', '모집인원', '최저학력기준',
                                     '2024학년도\n경쟁률', '2023학년도\n경쟁률', '2024학년도\n70% 입결',
                                     '2024학년도\n충원', '지원시\n유의사항', '대학별\n고사 실시일'],
