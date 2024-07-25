@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import matplotlib.font_manager as fm
 
 load_dotenv()
-api_key = os.getenv('OPENAI_API_KEY')
+api_key = os.getenv('API_KEY')
 client = OpenAI(api_key=api_key)
 
 # 한글 폰트 설정
