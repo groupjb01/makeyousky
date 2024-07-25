@@ -486,7 +486,7 @@ def main():
 
                 def sort_and_filter(df, criteria, order):
                     if criteria == "수능 최저 없음 우선":
-                        sorted_df = df.sort_values(by=['수능_최저요건'], key=lambda col: col == '미적용', ascending=False).head(
+                        sorted_df = df.sort_values(by=['2025년_수능최저'], key=lambda col: col == '없음', ascending=False).head(
                             10)
                     elif criteria == "신설":
                         sorted_df = df[df['신설'] == order].head(10)
