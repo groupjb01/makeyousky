@@ -13,7 +13,7 @@ api_key = os.getenv('API_KEY')
 client = OpenAI(api_key=api_key)
 
 # 한글 폰트 설정
-font_path = '/Users/isaac/Library/Fonts/maruburi/MaruBuri-Regular.otf'
+font_path = 'MaruBuri-Regular.otf'
 font_prop = fm.FontProperties(fname=font_path)
 fm.fontManager.addfont(font_path)
 plt.rcParams['font.family'] = font_prop.get_name()
