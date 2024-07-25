@@ -26,7 +26,7 @@ def save_as_pdf(report):
     c = canvas.Canvas(buffer, pagesize=letter)
 
     # 한글 폰트 설정
-    font_path = '/Users/isaac/Library/Fonts/maruburi/MaruBuri-Regular.ttf'
+    font_path = 'MaruBuri-Regular.otf'
     pdfmetrics.registerFont(TTFont('MaruBuri', font_path))
     c.setFont('MaruBuri', 12)
 
