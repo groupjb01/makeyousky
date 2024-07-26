@@ -7,3 +7,4 @@ streamlit
 python-docx
 reportlab
 openpyxl
+streamlit-authenticator
