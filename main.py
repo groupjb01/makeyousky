@@ -13,6 +13,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 import base64
 import streamlit as st
+import streamlit_authenticator as stauth
 import yaml
 
 with open('config.yaml') as file:
