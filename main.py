@@ -12,6 +12,39 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 import base64
+import streamlit as st
+import yaml
+
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=stauth.SafeLoader)
+
+## yaml 파일 데이터로 객체 생성
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+
+## 로그인 위젯 렌더링
+## log(in/out)(로그인 위젯 문구, 버튼 위치)
+## 버튼 위치 = "main" or "sidebar"
+name, authentication_status, username = authenticator.login("Login","main")
+
+# authentication_status : 인증 상태 (실패=>False, 값없음=>None, 성공=>True)
+if authentication_status == False:
+    st.error("Username/password is incorrect")
+
+if authentication_status == None:
+    st.warning("Please enter your username and password")
+
+if authentication_status:
+    authenticator.logout("Logout","sidebar")
+    st.sidebar.title(f"Welcome {name}")
+    
+    ## 로그인 후 기능들 작성 ##
+
 
 def save_as_docx(report):
     doc = Document()
