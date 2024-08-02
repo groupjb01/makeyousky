@@ -6,10 +6,13 @@ credentials:
   usernames:
     ayoung:
       name: "\uC544\uC601"
-      password: $2b$12$5HOduCuHGy/iD11u3RSc/.V./bHKuc15xMdW6D/TRvb3OYmJPYe5G
+      password: $2b$12$VNQuyN7NTeCIYzGp0B6sdOdKlJLExFyC0ItJ0Cswk3wSGNiprhLFm
+    sungho:
+      name: "\uC131\uD638"
+      password: $2b$12$0uvxOGxOYA6ZEz30LndZzOfMTIkLfIVg0l48TryMQAXeMIEx66a3S
     sunkyu:
       name: "\uC120\uADDC"
-      password: $2b$12$sckcKxHh6TW.6vf4uEQCveEJXbyCbclPS11uZx9NSiswesPtStOOW
+      password: $2b$12$..B42.dCo4sUenaZ3TBqCeIPdAo9TH1nP6rzIg4N8o5Uv8koqh5tW
 preauthorized:
   emails:
   - melsby@gmail.com
