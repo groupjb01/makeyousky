@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import matplotlib.font_manager as fm
 import numpy as np
 import time
+from data_loader import expert_knowledge
 
 # 환경 변수 로드 및 OpenAI 클라이언트 설정
 load_dotenv()
@@ -35,19 +36,6 @@ def format_value(value):
     return str(value)
 
 
-# RAG 시스템 모의 구현
-class RAGSystem:
-    def __init__(self, knowledge_file):
-        with open(knowledge_file, 'r', encoding='utf-8') as file:
-            self.knowledge = file.read()
-
-    def retrieve(self, query):
-        # 실제로는 더 복잡한 검색 로직이 필요하지만, 여기서는 간단히 구현
-        return self.knowledge
-
-
-rag_system = RAGSystem('expert_knowledge.txt')
-
 # 필요한 컬럼 리스트 수정
 needed_columns = [
     '대학명', '전형구분', '전형명', '모집단위', '계열', '계열구분', '계열상세명',
@@ -58,7 +46,7 @@ needed_columns = [
     '2024년_입결50%', '2023년_입결50%', '2022년_입결50%',
     '2024년_충원율(%)', '2023년_충원율(%)', '2022년_충원율(%)',
     '2024년_추가합격자수', '2023년_추가합격자수', '2022년_추가합격자수',
-    '2025년_수능최저', '2025년_최저요약', '2025년_수능최저코드', '2024년_수능최저',
+    '2025년_최저요약', '2025년_수능최저코드', '2024년_수능최저',
     '2024년_경쟁률백분위', '2024년_경쟁률변동(%)', '2024년_계열경쟁률변동(%)',
     '3개년_경쟁률_평균', '3개년_경쟁률_변동(%)',
     '2024년_입결70%변동(%)', '3개년_입결70%_평균', '3개년_입결50%_평균',
@@ -72,7 +60,10 @@ needed_columns = [
 
 def generate_overall_opinion_prompt(student_info, university_list):
     prompt = f"""
-    다음 학생 정보와 지원 가능 대학 목록을 참고하여 학생의 대학 지원에 대한 전략적이고 간결한 종합 의견을 제시해주세요. 전문지식을 참고하여 작성하세요.
+    다음 전문지식과 학생 정보, 지원 가능 대학 목록을 참고하여 학생의 대학 지원에 대한 전략적이고 간결한 종합 의견을 제시해주세요.
+
+    전문지식:
+    {expert_knowledge}
 
     학생 정보:
     {student_info}
@@ -91,7 +82,10 @@ def generate_overall_opinion_prompt(student_info, university_list):
 
 def generate_top_3_recommendations_prompt(university_data):
     prompt = f"""
-    다음 상향 지원 대상 대학 정보를 참고하여 상향 지원 BEST 3에 대한 간결하고 전략적인 분석을 제공해주세요. 전문지식을 참고하여 작성하세요.
+    다음 전문지식과 상향 지원 대상 대학 정보를 참고하여 상향 지원 BEST 3에 대한 간결하고 전략적인 분석을 제공해주세요. 전문지식을 참고하여 작성하세요.
+    
+    전문지식:
+    {expert_knowledge}
 
     상향 지원 대상 대학 정보:
     {university_data}
@@ -109,22 +103,25 @@ def generate_top_3_recommendations_prompt(university_data):
 
 def generate_detailed_analysis_prompt(university_info, admission_data):
     prompt = f"""
-    다음 대학/학과 정보와 입시 데이터를 참고하여 상세 분석 보고서를 작성해 주세요. 전문지식을 참고하여 작성하세요.
+    다음 전문지식과 대학/학과 정보와 입시 데이터를 참고하여 상세 분석 보고서를 작성해 주세요. 전문지식을 참고하여 작성하세요.
 
+    전문지식:
+    {expert_knowledge}
+    
     대학/학과 정보:
     {university_info}
 
     입시 데이터:
     {admission_data}
 
-    요구사항:
+    요구사항: 
     1. 3개년 데이터를 바탕으로 경쟁률, 입결, 충원율의 추이를 분석하고, 주기적 변동 패턴이 있는지 확인하세요.
     2. 경쟁률이 6대 1 이하이거나 10대 1 이상인 경우, 그 의미를 분석하고 다음 해 변동 가능성을 예측하세요.
     3. 모집인원 변화가 40% 이상인 경우, 그 영향을 설명하세요.
     4. 50%와 70% 컷의 차이를 분석하고, 그 의미를 설명하세요.
     5. 전형 방법이나 수능 최저 기준의 변화가 있다면 그 영향을 분석하세요.
     6. 학과의 선호도 변화 가능성(예: 경영학, 교육학, 행정학 등)을 고려하여 분석하세요.
-    7. 지원자를 위한 구체적인 전략을 2-3가지 제안하세요. 주기적 변동을 고려한 전략도 포함하세요.
+    7. 주기적 변동성을 고려한 의견도 포함하세요.
     8. 이 모든 것을 한 문단으로, 300단어 이내로 작성하세요.
     """
     return prompt
@@ -133,8 +130,7 @@ def generate_gpt_response(prompt):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system",
-             "content": "You are a helpful assistant that generates reports based on university admission data."},
+            {"role": "system", "content": "You are a helpful assistant that generates reports based on university admission data. Please refer to the expert knowledge provided in the prompt when answering. Answer in Korean."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=1000
@@ -301,17 +297,21 @@ def generate_university_list(high_info, mid_info, low_info):
     return university_list
 
 
-def generate_report(high_info, mid_info, low_info, student_info, all_data):
+def generate_report(high_info, mid_info, low_info, student_info, all_data, addtional_data):
     report = ""
 
     # 기본 정보
     report += "### 기본 정보 🏫\n\n"
-    report += f"""
-    | 학교유형 | 계열(인문/자연) | 희망계열(세부계열) | 내신성적 | 수능최저역량 | 비교과 활동수준 | 주요과목 우수 |
-    |----------|-----------------|---------------------|----------|--------------|------------------|---------------|
-    | {student_info['school_type']} | {', '.join(student_info['field'])} | {student_info['major_interest']} | {student_info['score']} | {student_info['lowest_ability']} | {student_info['non_subject_level']} | {'Yes' if student_info['major_subjects_strong'] == 'YES' else 'No'} |
-
-    """
+    basic_info = pd.DataFrame([
+        {'학교유형': student_info['school_type'],
+         '계열(인문/자연)': ', '.join(student_info['field']),
+         '희망계열(세부계열)': student_info['major_interest'],
+         '내신성적': student_info['score'],
+         '수능최저역량': student_info['lowest_ability'],
+         '비교과 활동수준': student_info['non_subject_level'],
+         '주요과목 우수': 'Yes' if student_info['major_subjects_strong'] == 'YES' else 'No'}
+    ])
+    report += basic_info.to_markdown(index=False) + "\n\n"
 
 
     # 지원 가능선
@@ -347,11 +347,15 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data):
 
     # 상향 지원 BEST 3
     report += "### 상향 지원 BEST 3 🌟\n\n"
-    report += """경쟁률과 입결은 해마다 변동성이 큰 지표이며 상승과 하락을 반복하는 경향이 있지만, 장기적으로 볼 때 각 학과별로 어느 정도 일정한 추세를 보입니다. 반면 충원율의 경우에는 학과마다 비교적 안정적인 경향성을 나타내고 있습니다.
+    report += """
+    경쟁률과 입결은 해마다 변동성이 큰 지표이며 상승과 하락을 반복하는 경향이 있지만, 장기적으로 볼 때 각 학과별로 어느 정도 일정한 추세를 보입니다. 반면 충원율의 경우에는 학과마다 비교적 안정적인 경향성을 나타내고 있습니다.
 
-        상향 지원은 통상 적정이나 안정 지원에 비해 합격 가능성이 다소 낮습니다. 그러나 철저한 분석을 바탕으로 전략적으로 접근한다면 상향 지원 역시 충분히 의미 있는 도전이 될 수 있습니다. 상향 지원을 고려하실 때에는 단순히 경쟁률이나 경쟁률 추이만 보는 것이 아니라, 경쟁 강도, 입결 상승율, 충원 강도 등 다양한 요소를 종합적으로 고려하시는 것이 중요합니다.
+    상향 지원은 통상 적정이나 안정 지원에 비해 합격 가능성이 다소 낮습니다. 그러나 철저한 분석을 바탕으로 전략적으로 접근한다면 상향 지원 역시 충분히 의미 있는 도전이 될 수 있습니다. 상향 지원을 고려하실 때에는 단순히 경쟁률이나 경쟁률 추이만 보는 것이 아니라, 경쟁 강도, 입결 상승율, 충원 강도 등 다양한 요소를 종합적으로 고려하시는 것이 중요합니다.
 
-        지략에서는 이러한 데이터를 바탕으로 상향 지원 대상 학과를 선정하여 추천 리스트를 제공해 드리고 있습니다. 적정이나 안정 지원만큼이나 상향 지원도 여러분께는 소중한 기회가 될 수 있습니다. 아래는 경쟁률, 입결, 충원율에 기반한 상향지원 BEST 3입니다.\n\n"""
+    지략에서는 이러한 데이터를 바탕으로 상향 지원 대상 학과를 선정하여 추천 리스트를 제공해 드리고 있습니다. 적정이나 안정 지원만큼이나 상향 지원도 여러분께는 소중한 기회가 될 수 있습니다. 아래는 경쟁률, 입결, 충원율에 기반한 상향지원 BEST 3입니다.
+
+    """
+    report += " \n\n"
 
     # GPT로 상향지원전략 작성 (교과와 종합 모두 포함)
     gpt_strategy_prompt = generate_top_3_recommendations_prompt(high_info.to_dict('records'))
@@ -380,7 +384,7 @@ def generate_detailed_tables(high_info, mid_info, low_info):
     tables = []
     for admission_type in ['교과', '종합']:
         columns_to_display = ['구분', '대학명', '전형구분', '전형명', '모집단위', '2025년_모집인원',
-                              '2024년_수능최저', '2024년_경쟁률', '2023년_경쟁률', '2024년_입결70%', '2024년_추가합격자수']
+                              '2025년_최저요약', '2024년_경쟁률', '2023년_경쟁률', '2024년_입결70%', '2024년_충원율(%)']
 
         combined_df = pd.DataFrame()
         for level, df in [('상향', high_info), ('적정', mid_info), ('하향', low_info)]:
@@ -425,7 +429,7 @@ def show_report_generation():
         with st.spinner("보고서 작성 중입니다..."):
             progress_bar = st.progress(0)
             for i in range(100):
-                time.sleep(1)  # 0.1초마다 진행 상황 업데이트
+                time.sleep(1)  # 0.01초마다 진행 상황 업데이트
                 progress_bar.progress(i + 1)
 
             high_info = pd.concat([preprocess_data(final_selection.get('교과_상향', pd.DataFrame())),
@@ -441,7 +445,8 @@ def show_report_generation():
             # all_data도 전처리
             all_data = preprocess_data(all_data)
 
-            report, tables = generate_report(high_info, mid_info, low_info, student_info, all_data)
+            additional_data = st.session_state['additional_data']
+            report, tables = generate_report(high_info, mid_info, low_info, student_info, all_data, additional_data)
 
         st.success("보고서 생성이 완료되었습니다!")
         st.markdown(report, unsafe_allow_html=True)
@@ -464,7 +469,7 @@ def show_report_generation():
                         "전형명": st.column_config.TextColumn("전형명", width=100),
                         "모집단위": st.column_config.TextColumn("모집단위", width=100),
                         "2025년_모집인원": st.column_config.TextColumn("모집", width=50),
-                        "2024년_수능최저": st.column_config.TextColumn("수능최저", width=80),
+                        "2025년_최저요약": st.column_config.TextColumn("수능최저", width=80),
                         "2024년_경쟁률": st.column_config.TextColumn("24경쟁", width=60),
                         "2023년_경쟁률": st.column_config.TextColumn("23경쟁", width=60),
                         "2024년_입결70%": st.column_config.TextColumn("입결70", width=60),
@@ -475,8 +480,7 @@ def show_report_generation():
             else:
                 st.warning(f"{table['title']} 지원 데이터가 없거나 필요한 열이 존재하지 않습니다.")
 
-
-        # 대학별 2025학년도 핵심정리 (다크모드 대응)
+        # 대학별 2025학년도 핵심정리
         st.markdown("---\n\n### 대학별 2025학년도 핵심정리 🎓\n\n")
 
         # 모든 필터링된 데이터를 합치기
@@ -487,24 +491,27 @@ def show_report_generation():
 
         # 추가 데이터와 매칭하여 핵심정리 출력
         additional_data = st.session_state['additional_data']
-        for _, row in unique_universities.iterrows():
-            match = additional_data[(additional_data['대학명'] == row['대학명']) &
-                                    (additional_data['전형구분'] == row['전형구분']) &
-                                    (additional_data['전형명'] == row['전형명'])]
-            if not match.empty:
-                st.markdown(f"**{row['대학명']} - {row['전형구분']} - {row['전형명']}**")
 
-                # 핵심정리 내용을 가져와서 줄바꿈 처리
-                core_summary = match.iloc[0]['2025학년도_핵심정리']
-                # '\n' 문자를 HTML의 <br> 태그로 변경
-                core_summary_html = core_summary.replace('\n', '<br>')
+        for admission_type in ['교과', '종합']:
+            st.subheader(f"{admission_type} 전형")
+            filtered_universities = unique_universities[unique_universities['전형구분'] == admission_type]
 
-                # HTML을 사용하여 출력 (다크모드 대응)
-                st.markdown(
-                    f"<div style='background-color: rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 5px;'>{core_summary_html}</div>",
-                    unsafe_allow_html=True)
+            for _, row in filtered_universities.iterrows():
+                match = additional_data[(additional_data['대학명'] == row['대학명']) &
+                                        (additional_data['전형구분'] == row['전형구분']) &
+                                        (additional_data['전형명'] == row['전형명'])]
+                if not match.empty:
+                    st.markdown(f"**{row['대학명']} - {row['전형명']}**")
 
-                st.markdown("---")
+                    core_summary = match.iloc[0]['2025학년도_핵심정리']
+                    core_summary_html = core_summary.replace('\n', '<br>')
+
+                    st.markdown(
+                        f"<div style='background-color: rgba(0, 0, 0, 0.1); color: black; padding: 10px; border-radius: 5px;'>{core_summary_html}</div>",
+                        unsafe_allow_html=True)
+
+                    st.markdown("---")
+
 
 if __name__ == "__main__":
     show_report_generation()
