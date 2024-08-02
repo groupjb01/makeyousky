@@ -1,0 +1,15 @@
+cookie:
+  expiry_days: 0
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    ayoung:
+      name: "\uC544\uC601"
+      password: $2b$12$5HOduCuHGy/iD11u3RSc/.V./bHKuc15xMdW6D/TRvb3OYmJPYe5G
+    sunkyu:
+      name: "\uC120\uADDC"
+      password: $2b$12$sckcKxHh6TW.6vf4uEQCveEJXbyCbclPS11uZx9NSiswesPtStOOW
+preauthorized:
+  emails:
+  - melsby@gmail.com
