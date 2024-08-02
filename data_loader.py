@@ -16,6 +16,14 @@ data = load_data('data_240802_1846.xlsx')
 additional_data = load_data('uni_info_summary_240802.xlsx')
 lowest_ability_codes = load_json('lowest_ability_codes.json')
 
+def load_expert_knowledge(file_path='expert_knowledge.txt'):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+expert_knowledge = load_expert_knowledge()
+
+
+
 
 SCHOOL_TYPE_ADJUSTMENT = {
     "일반고": 1.0,
