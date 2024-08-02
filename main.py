@@ -53,5 +53,5 @@ if authentication_status:
         with tabs[4]:
             report_generation.show_report_generation()
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
