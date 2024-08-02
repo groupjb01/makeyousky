@@ -5,14 +5,14 @@ cookie:
 credentials:
   usernames:
     ayoung:
-      name: "\uC544\uC601"
-      password: $2b$12$VNQuyN7NTeCIYzGp0B6sdOdKlJLExFyC0ItJ0Cswk3wSGNiprhLFm
+      name: "\uC544\uC601\uC0D8"
+      password: $2b$12$xDupHoX7/tGwPMGSQ1ng7OX1I18Ewfkrg/jIqx2G9RQ4eDkjZ/VkO
     sungho:
-      name: "\uC131\uD638"
-      password: $2b$12$0uvxOGxOYA6ZEz30LndZzOfMTIkLfIVg0l48TryMQAXeMIEx66a3S
+      name: "\uC131\uD638\uC0D8"
+      password: $2b$12$VROxrcCID/xxhBqV9LAKUuT/NlRDrhRJZqAaSGpN1N8yCunVo36La
     sunkyu:
-      name: "\uC120\uADDC"
-      password: $2b$12$..B42.dCo4sUenaZ3TBqCeIPdAo9TH1nP6rzIg4N8o5Uv8koqh5tW
+      name: "\uC120\uADDC\uC0D8"
+      password: $2b$12$cCpAHik33kEbGmMSlYo.Su.uJHoXhO./nxbJW49ufw6rI4e0FLvRW
 preauthorized:
   emails:
   - melsby@gmail.com
