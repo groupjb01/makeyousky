@@ -9,5 +9,4 @@ reportlab
 openpyxl
 streamlit-authenticator==0.2.2
 numpy
-io
 base64
