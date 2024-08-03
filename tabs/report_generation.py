@@ -91,12 +91,24 @@ def generate_top_3_recommendations_prompt(university_data):
     {university_data}
 
     요구사항:
-    1. 각 대학/학과의 3개년 경쟁률, 입결, 충원율 추이를 요약하고, 주기적 변동 패턴이 있는지 분석하세요.
-    2. 경쟁률이 6대 1 이하인 경우 특별히 언급하고, 그 의미와 다음 해 변동 가능성을 설명하세요.
-    3. 모집인원의 변화가 40% 이상인 경우 이를 지적하고, 그 영향을 분석하세요.
-    4. 50%와 70% 컷의 차이가 큰 경우 이를 언급하고, 그 의미를 설명하세요.
-    5. 각 대학/학과의 전형 방법이나 수능 최저 기준 변화가 있다면 언급하세요.
-    6. 각 대학/학과별로 100단어 이내로 작성하되, 대학별로 한 문단씩 나누어 작성하세요.
+    1. 교과 전형과 학생부 종합 전형을 구분하여 분석하세요.
+    2. 각 전형별로 3개 대학/학과에 대해 분석하세요.
+    3. 각 대학/학과의 3개년 경쟁률, 입결, 충원율 추이를 요약하고, 주기적 변동 패턴이 있는지 분석하세요.
+    4. 경쟁률이 6대 1 이하인 경우 특별히 언급하고, 그 의미와 다음 해 변동 가능성을 설명하세요.
+    5. 모집인원의 변화가 40% 이상인 경우 이를 지적하고, 그 영향을 분석하세요.
+    6. 50%와 70% 컷의 차이가 큰 경우 이를 언급하고, 그 의미를 설명하세요.
+    7. 각 대학/학과의 전형 방법이나 수능 최저 기준 변화가 있다면 언급하세요.
+    8. 각 대학/학과별로 100단어 이내로 작성하되, 대학별로 한 문단씩 나누어 작성하세요.
+    9. 응답 형식:
+       [교과 전형]
+       1. 대학명 학과명: 분석 내용
+       2. 대학명 학과명: 분석 내용
+       3. 대학명 학과명: 분석 내용
+
+       [학생부 종합 전형]
+       1. 대학명 학과명: 분석 내용
+       2. 대학명 학과명: 분석 내용
+       3. 대학명 학과명: 분석 내용
     """
     return prompt
 
@@ -361,7 +373,16 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     # GPT로 상향지원전략 작성 (교과와 종합 모두 포함)
     gpt_strategy_prompt = generate_top_3_recommendations_prompt(high_info.to_dict('records'))
     gpt_strategy_response = generate_gpt_response(gpt_strategy_prompt)
-    report += gpt_strategy_response + "\n\n"
+    
+    # GPT 응답을 교과와 종합으로 분리
+    edu_curriculum, comprehensive = gpt_strategy_response.split('[학생부 종합 전형]')
+    
+    report += "#### 교과 전형\n\n"
+    report += edu_curriculum.replace('[교과 전형]', '').strip() + "\n\n"
+    
+    report += "#### 학생부 종합 전형\n\n"
+    report += comprehensive.strip() + "\n\n"
+    
     report += "---\n\n"
 
     report += "각 상향지원 안에 대해 자세히 설명드리겠습니다.\n\n"
