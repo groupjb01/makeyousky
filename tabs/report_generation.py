@@ -305,7 +305,7 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     basic_info = pd.DataFrame([
         {'학교유형': student_info['school_type'],
          '계열(인문/자연)': ', '.join(student_info['field']),
-         '희망계열(세부계열)': student_info['major_interest'],
+         '희망계열(세부계열)': ', '.join(student_info['detail_fields']),
          '내신성적': student_info['score'],
          '수능최저역량': student_info['lowest_ability'],
          '비교과 활동수준': student_info['non_subject_level'],
