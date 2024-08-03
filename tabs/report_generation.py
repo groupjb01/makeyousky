@@ -346,7 +346,7 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     report += "---\n\n"
 
     # 상향 지원 BEST 3
-    report += "### 상향 지원 BEST 3 🌟\n\n"
+    report += "### 상향 지원 BEST 3 🌟\n"
     best_3_text = """
     경쟁률과 입결은 해마다 변동성이 큰 지표이며 상승과 하락을 반복하는 경향이 있지만, 장기적으로 볼 때 각 학과별로 어느 정도 일정한 추세를 보입니다. 반면 충원율의 경우에는 학과마다 비교적 안정적인 경향성을 나타내고 있습니다.
     
@@ -356,7 +356,7 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     """
     best_3_html = best_3_text.replace('\n', '<br>')
     report += f"<div style='background-color: rgba(0, 0, 0, 0.05); padding: 10px; border-radius: 5px;'>{best_3_html}</div>\n\n"
-
+    report += "\n"
 
     # GPT로 상향지원전략 작성 (교과와 종합 모두 포함)
     gpt_strategy_prompt = generate_top_3_recommendations_prompt(high_info.to_dict('records'))
