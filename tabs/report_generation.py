@@ -27,6 +27,7 @@ plt.rcParams['axes.unicode_minus'] = False
 # Seaborn 스타일 설정
 sns.set_theme(style="whitegrid", palette="pastel")
 
+
 # 여기에 format_value 함수를 추가
 def format_value(value):
     if pd.isna(value):
@@ -83,7 +84,7 @@ def generate_overall_opinion_prompt(student_info, university_list):
 def generate_top_3_recommendations_prompt(university_data):
     prompt = f"""
     다음 전문지식과 상향 지원 대상 대학 정보를 참고하여 상향 지원 BEST 3에 대한 간결하고 전략적인 분석을 제공해주세요. 전문지식을 참고하여 작성하세요.
-    
+
     전문지식:
     {expert_knowledge}
 
@@ -119,14 +120,14 @@ def generate_detailed_analysis_prompt(university_info, admission_data):
 
     전문지식:
     {expert_knowledge}
-    
+
     대학/학과 정보:
     {university_info}
 
     입시 데이터:
     {admission_data}
 
-    요구사항: 
+    요구사항:
     1. 3개년 데이터를 바탕으로 경쟁률, 입결, 충원율의 추이를 분석하고, 주기적 변동 패턴이 있는지 확인하세요.
     2. 경쟁률이 6대 1 이하이거나 10대 1 이상인 경우, 그 의미를 분석하고 다음 해 변동 가능성을 예측하세요.
     3. 모집인원 변화가 40% 이상인 경우, 그 영향을 설명하세요.
@@ -138,11 +139,13 @@ def generate_detailed_analysis_prompt(university_info, admission_data):
     """
     return prompt
 
+
 def generate_gpt_response(prompt):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that generates reports based on university admission data. Please refer to the expert knowledge provided in the prompt when answering. Answer in Korean."},
+            {"role": "system",
+             "content": "You are a helpful assistant that generates reports based on university admission data. Please refer to the expert knowledge provided in the prompt when answering. Answer in Korean."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=1000
@@ -201,8 +204,6 @@ def analyze_university(row, all_data, index, admission_type):
     report += f"- 2024학년도 경쟁률 변동(%): {format_value(row['2024년_경쟁률변동(%)'])} (계열 평균: {format_value(row['2024년_계열경쟁률변동(%)'])})\n"
     report += f"- 3개년 평균 경쟁률: {format_value(row['3개년_경쟁률_평균'])} (계열 평균: {format_value(row['3개년_계열경쟁률_평균'])})\n\n"
 
-
-
     # 입결 분석
     report += "#### 입결 분석\n\n"
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 5))
@@ -246,7 +247,6 @@ def analyze_university(row, all_data, index, admission_type):
     report += f"- 2024학년도 70% 입결: {format_value(row['2024년_입결70%'])} (계열 평균: {format_value(row['2024년_계열입결70%'])})\n"
     report += f"- 2024학년도 70% 입결 변동(%): {format_value(row['2024년_입결70%변동(%)'])} (계열 평균: {format_value(row['2024년_계열입결70%변동(%)'])})\n"
     report += f"- 3개년 평균 70% 입결: {format_value(row['3개년_입결70%_평균'])} (계열 평균: {format_value(row['3개년_계열입결70%_평균'])})\n\n"
-
 
     # 충원율 분석
     report += "#### 충원율 분석\n\n"
@@ -325,7 +325,6 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     ])
     report += basic_info.to_markdown(index=False) + "\n\n"
 
-
     # 지원 가능선
     report += "### 지원 가능선 🎯\n\n"
     report += "| | 교과 | 학생부 종합 |\n"
@@ -361,9 +360,9 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     report += "### 상향 지원 BEST 3 🌟\n"
     best_3_text = """
     경쟁률과 입결은 해마다 변동성이 큰 지표이며 상승과 하락을 반복하는 경향이 있지만, 장기적으로 볼 때 각 학과별로 어느 정도 일정한 추세를 보입니다. 반면 충원율의 경우에는 학과마다 비교적 안정적인 경향성을 나타내고 있습니다.
-    
+
     상향 지원은 통상 적정이나 안정 지원에 비해 합격 가능성이 다소 낮습니다. 그러나 철저한 분석을 바탕으로 전략적으로 접근한다면 상향 지원 역시 충분히 의미 있는 도전이 될 수 있습니다. 상향 지원을 고려하실 때에는 단순히 경쟁률이나 경쟁률 추이만 보는 것이 아니라, 경쟁 강도, 입결 상승율, 충원 강도 등 다양한 요소를 종합적으로 고려하시는 것이 중요합니다.
-    
+
     지략에서는 이러한 데이터를 바탕으로 상향 지원 대상 학과를 선정하여 추천 리스트를 제공해 드리고 있습니다. 적정이나 안정 지원만큼이나 상향 지원도 여러분께는 소중한 기회가 될 수 있습니다. 아래는 경쟁률, 입결, 충원율에 기반한 상향지원 BEST 3입니다.
     """
     best_3_html = best_3_text.replace('\n', '<br>')
@@ -373,16 +372,16 @@ def generate_report(high_info, mid_info, low_info, student_info, all_data, addti
     # GPT로 상향지원전략 작성 (교과와 종합 모두 포함)
     gpt_strategy_prompt = generate_top_3_recommendations_prompt(high_info.to_dict('records'))
     gpt_strategy_response = generate_gpt_response(gpt_strategy_prompt)
-    
+
     # GPT 응답을 교과와 종합으로 분리
     edu_curriculum, comprehensive = gpt_strategy_response.split('[학생부 종합 전형]')
-    
+
     report += "#### 교과 전형\n\n"
     report += edu_curriculum.replace('[교과 전형]', '').strip() + "\n\n"
-    
+
     report += "#### 학생부 종합 전형\n\n"
     report += comprehensive.strip() + "\n\n"
-    
+
     report += "---\n\n"
 
     report += "각 상향지원 안에 대해 자세히 설명드리겠습니다.\n\n"
